@@ -1,14 +1,27 @@
 # Projeto de Compiladores — Etapa 4: Análise Semântica 1
 
-Nesta etapa, o grupo implementará resolução de nomes, escopos e verificação de
-tipos sobre a AST da MicroC. Leia primeiro o [enunciado completo](ENUNCIADO.pdf)
+Este projeto implementa resolução de nomes, escopos e verificação de
+tipos sobre a AST da MicroC. Leia o [enunciado completo](ENUNCIADO.pdf)
 e mantenha por perto a especificação normativa da linguagem.
 
-## Recupere as etapas anteriores
+## Integração das etapas anteriores
 
-Substitua `Lexer.py` e `parser.py` pelas implementações entregues pelo grupo nas
-etapas anteriores. Os arquivos `ast_nodes.py` e `ast_printer.py` reproduzem a
-interface publicada para a AST e não devem ter seus nomes ou campos alterados.
+`Lexer.py` foi integrado do projeto `Grupo-19`, e `parser.py`, do projeto
+`Grupo-19-Parser`. A conversão de inteiros do lexer usa grupos de dígitos para
+que literais muito longos também cheguem à verificação de limites na semântica.
+Os arquivos `ast_nodes.py` e `ast_printer.py` são idênticos aos da etapa do
+parser e preservam a interface publicada.
+
+O pipeline mantém o mesmo objeto `Program` e seus nós:
+
+```python
+program = Parser(Lexer(source).scan()).parse()
+program = SemanticAnalyzer().analyze(program)
+```
+
+A primeira passagem coleta assinaturas, cria escopos e vincula usos a símbolos.
+A segunda verifica tipos e contextos. Erros de nomes impedem a passagem de
+tipos. As anotações usam as chaves `symbol`, `scope` e `type` em `metadata`.
 
 ## Arquivos novos
 
@@ -38,8 +51,8 @@ python runner.py test.mc
 python -m pytest -q
 ```
 
-Os testes inicialmente alcançam os `NotImplementedError` das duas passagens e
-passarão progressivamente. A correção também usa testes privados, sempre
+Os testes públicos verificam os contratos, metadados e diagnósticos do pipeline.
+A correção também usa testes privados, sempre
 compatíveis com o enunciado e com a especificação da MicroC.
 
 ## Limite desta etapa
@@ -51,7 +64,7 @@ caminhos. Esses problemas pertencem à Análise Semântica 2.
 
 ## Antes de entregar
 
-- copie o lexer e o parser completos do grupo;
+- confirme a integração do lexer e do parser completos do grupo;
 - execute todos os testes públicos;
 - confira categorias e coordenadas dos diagnósticos;
 - não antecipe a análise de fluxo da próxima etapa; e
